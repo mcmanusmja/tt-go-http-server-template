@@ -1,0 +1,26 @@
+steps:
+  - name: "gcr.io/cloud-builders/docker"
+    args: ["build", "-t", "gcr.io/GCP-PROJECT/APPNAME:latest", "."]
+  - name: "gcr.io/cloud-builders/docker"
+    args: ["push", "gcr.io/GCP-PROJECT/APPNAME:latest"]
+  - name: "gcr.io/cloud-builders/gcloud"
+    args: ["container", "clusters", "update", "CLUSTER", "--zone", "us-west1-a", "--project", "GCP-PROJECT", "--enable-master-authorized-networks", "--master-authorized-networks", "MASTER-NETWORKS"]
+  - name: "gcr.io/cloud-builders/gke-deploy"
+    args:
+      - run
+      - --filename=kubernetes/deployment.yaml
+      - --image=gcr.io/GCP-PROJECT/APPNAME:latest
+      - --location=LOCATION
+      - --cluster=CLUSTER
+    timeout: 600s
+  - name: "gcr.io/cloud-builders/gcloud"
+    args: ["container", "clusters", "update", "CLUSTER", "--zone", "ZONE", "--project", "GCP-PROJECT", "--no-enable-master-authorized-networks"]
+  - name: "gcr.io/cloud-builders/gcloud"
+    args: ["container", "clusters", "update", "CLUSTER", "--zone", "ZONE", "--project", "GCP-PROJECT", "--enable-master-authorized-networks", "--master-authorized-networks", "AUTHORIZED NETWORKS"]
+
+
+
+
+
+
+
